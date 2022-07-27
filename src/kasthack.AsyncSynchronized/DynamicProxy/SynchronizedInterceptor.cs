@@ -1,25 +1,32 @@
 ﻿namespace kasthack.AsyncSynchronized.DynamicProxy
 {
     using System.Threading.Tasks;
+
     using Castle.DynamicProxy;
+
     using kasthack.AsyncSynchronized;
 
+    /// <summary>
+    /// Intercepter that implements threadsafe access to the undelying object.
+    /// </summary>
     internal class SynchronizedInterceptor : AsyncInterceptorBase, IDisposable
     {
         private readonly SynchronizedOptions options;
-        private bool disposed;
         private SemaphoreSlim accessSemaphore = new(1);
+        private bool disposed;
 
-        public SynchronizedInterceptor(SynchronizedOptions options)
-        {
-            this.options = options;
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SynchronizedInterceptor"/> class.
+        /// </summary>
+        /// <param name="options">Interception options.</param>
+        public SynchronizedInterceptor(SynchronizedOptions options) => this.options = options;
 
         ~SynchronizedInterceptor()
         {
             this.Dispose(false);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             this.Dispose(true);
@@ -34,7 +41,7 @@
             }
 
             var targetMethod = invocation.Method;
-            if (this.options.AllowGetters)
+            if (this.options.BypassPropertyGetterCalls)
             {
                 // https://stackoverflow.com/a/34506781/17594255
                 var isGetter = targetMethod.IsSpecialName && targetMethod.ReturnType != typeof(void) && targetMethod.GetParameters().Length == 0;

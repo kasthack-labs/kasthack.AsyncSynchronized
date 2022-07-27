@@ -23,6 +23,7 @@ Current version is a PoC whiich relies on Castle.DynamicProxies, so
 * Only virtual members or interface methods get synchronized.
 * Non-virtual properties seem to be broken in the proxy library.
 * Proxied types must have parameterless constructors(maybe, I've just missed a configuration option somewhere is Castle)
+	* You can bypass this by passing an interface as a type parameter.
 
 This library can be rewritten with compile-time code generators or at least with `Reflection.Emit`.
 
@@ -40,3 +41,29 @@ This library can be rewritten with compile-time code generators or at least with
 ### Examples
 
 Check out `kasthack.AsyncSynchronized.Tests` project.
+
+## Performance
+
+Here's a comparison between empty method calls and synchronized wrappers on my laptop:
+
+Empty method:
+
+|              Method |      Mean |     Error |    StdDev |
+|-------------------- |----------:|----------:|----------:|
+|           AsyncTask | 18.191 ns | 0.1127 ns | 0.1054 ns |
+| AsyncTaskWithResult | 17.065 ns | 0.3587 ns | 0.2995 ns |
+|                 Int |  1.988 ns | 0.0400 ns | 0.0334 ns |
+|            Property |  2.117 ns | 0.0796 ns | 0.0917 ns |
+|      TaskWithResult |  3.330 ns | 0.1103 ns | 0.1227 ns |
+|                Void |  2.250 ns | 0.0281 ns | 0.0250 ns |
+
+Synchronized:
+
+|              Method |     Mean |   Error |  StdDev |
+|-------------------- |---------:|--------:|--------:|
+|           AsyncTask | 234.2 ns | 2.49 ns | 2.33 ns |
+| AsyncTaskWithResult | 400.9 ns | 6.84 ns | 5.71 ns |
+|                 Int | 336.0 ns | 4.11 ns | 3.64 ns |
+|            Property | 347.2 ns | 3.31 ns | 2.77 ns |
+|      TaskWithResult | 368.8 ns | 3.52 ns | 3.12 ns |
+|                Void | 215.8 ns | 4.28 ns | 8.03 ns |

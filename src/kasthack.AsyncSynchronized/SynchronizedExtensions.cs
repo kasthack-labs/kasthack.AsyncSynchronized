@@ -1,19 +1,26 @@
 ﻿namespace kasthack.AsyncSynchronized
 {
-    using kasthack.AsyncSynchronized.DynamicProxy;
 
     public static class SynchronizedExtensions
     {
+        /// <summary>
+        /// Creates an asynchronous synchronized proxy.
+        /// </summary>
+        /// <typeparam name="T">Type to create proxy for.</typeparam>
+        /// <param name="target">Object instance to wrap.</param>
+        /// <param name="logger">Test logger</param>
+        /// <param name="bypassPropertyGetterCalls">Allow calling property getters without acquiring a lock.</param>
+        /// <returns>Synchronized proxy.</returns>
         public static T Synchronized<T>(
             this T target,
 #if DEBUG
             Xunit.Abstractions.ITestOutputHelper logger,
 #endif
-            bool allowGetters = true)
+            bool bypassPropertyGetterCalls = true)
             where T : class
-            => SynchronizedFactory.Create<T>(
+            => DynamicProxy.SynchronizedFactory.Create<T>(
                 target,
-                new SynchronizedOptions(allowGetters)
+                new SynchronizedOptions(bypassPropertyGetterCalls)
                 {
 #if DEBUG
                     Logger = logger,

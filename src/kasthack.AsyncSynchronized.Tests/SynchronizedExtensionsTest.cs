@@ -21,7 +21,7 @@ namespace kasthack.AsyncSynchronized.Tests
         [Fact]
         public async Task InterceptedInterfaceTargetWorks() => await this.AssertTargetProperties(new InterfacedTestTarget(1).Synchronized<ITestTarget>(this.Logger), 1, 1, 0).ConfigureAwait(false);
 
-        public async Task AssertTargetProperties(ITestTarget target, int exprectedProgressThreads, int expectedProgressCalls, int expectedProgressReturns)
+        private async Task AssertTargetProperties(ITestTarget target, int exprectedProgressThreads, int expectedProgressCalls, int expectedProgressReturns)
         {
             target.Logger = this.Logger;
 

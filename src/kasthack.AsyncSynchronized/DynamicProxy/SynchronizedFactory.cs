@@ -2,6 +2,9 @@
 {
     using Castle.DynamicProxy;
 
+    /// <summary>
+    /// Castle.DynamicProxies-based implementation.
+    /// </summary>
     internal static class SynchronizedFactory
     {
         private static readonly ProxyGenerator ProxyGenerator = new();
