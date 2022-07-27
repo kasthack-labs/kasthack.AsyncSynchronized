@@ -2,7 +2,7 @@
 {
     using Xunit.Abstractions;
 
-    public record TestTarget
+    public class TestTarget : ITestTarget
     {
         public const int OperationTimeInMilliseconds = 1000;
 

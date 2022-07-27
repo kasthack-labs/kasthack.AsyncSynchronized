@@ -1,8 +1,10 @@
 namespace kasthack.AsyncSynchronized.Tests
 {
     using System.Diagnostics;
+
     using kasthack.AsyncSynchronized;
     using kasthack.AsyncSynchronized.Tests.Targets;
+
     using Xunit.Abstractions;
 
     public record SynchronizedExtensionsTest(ITestOutputHelper Logger)
@@ -13,7 +15,13 @@ namespace kasthack.AsyncSynchronized.Tests
         [Fact]
         public async Task InterceptedClassTargetWorks() => await this.AssertTargetProperties(new TestTarget().Synchronized(this.Logger), 1, 1, 0).ConfigureAwait(false);
 
-        public async Task AssertTargetProperties(TestTarget target, int exprectedProgressThreads, int expectedProgressCalls, int expectedProgressReturns)
+        [Fact]
+        public void InterceptionWithoutPublicParameterlessConstructorFails() => Assert.Throws<ArgumentException>(() => new InterfacedTestTarget(1).Synchronized(this.Logger));
+
+        [Fact]
+        public async Task InterceptedInterfaceTargetWorks() => await this.AssertTargetProperties(new InterfacedTestTarget(1).Synchronized<ITestTarget>(this.Logger), 1, 1, 0).ConfigureAwait(false);
+
+        public async Task AssertTargetProperties(ITestTarget target, int exprectedProgressThreads, int expectedProgressCalls, int expectedProgressReturns)
         {
             target.Logger = this.Logger;
 
@@ -33,7 +41,7 @@ namespace kasthack.AsyncSynchronized.Tests
             await Task.Delay(TestTarget.OperationTimeInMilliseconds / 2).ConfigureAwait(false);
 
             this.Logger.WriteLine($"[{DateTimeOffset.Now:O}]Starting fetching of in-progress state / {target.ID}");
-            var (actualThreads, actualCalls, actualReturns) = (target.ThreadCount,  target.CallCount, target.ReturnCount);
+            var (actualThreads, actualCalls, actualReturns) = (target.ThreadCount, target.CallCount, target.ReturnCount);
             this.Logger.WriteLine($"[{DateTimeOffset.Now:O}]Completed fetching of in-progress state / {target.ID}");
 
             Assert.True(exprectedProgressThreads == actualThreads, $"progress {nameof(target.ThreadCount)} is {actualThreads} instead of {exprectedProgressThreads} / {target.ID}");
