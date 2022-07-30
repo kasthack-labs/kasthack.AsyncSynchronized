@@ -3,8 +3,12 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
+using kasthack.AsyncSynchronized.Benchmark.Targets;
+
 public abstract class BenchmarkBase
 {
+    private const int Loops = 10_000;
+
     protected abstract BenchmarkTarget Target { get; }
 
     [Benchmark]
@@ -19,8 +23,17 @@ public abstract class BenchmarkBase
     [Benchmark]
     public int Property() => _ = this.Target.Property;
 
-    [Benchmark]
-    public Task<int> TaskWithResult() => this.Target.TaskWithResult();
+    [Benchmark(OperationsPerInvoke = Loops)]
+    public async Task<int> TaskWithResult()
+    {
+        var result = 0;
+        for (int i = 0; i < Loops; i++)
+        {
+            result += await this.Target.TaskWithResult().ConfigureAwait(false);
+        }
+
+        return result;
+    }
 
     [Benchmark]
     public void Void() => this.Target.Void();
