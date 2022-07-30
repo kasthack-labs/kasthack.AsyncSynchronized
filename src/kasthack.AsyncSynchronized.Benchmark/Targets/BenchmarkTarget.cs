@@ -1,4 +1,4 @@
-﻿namespace kasthack.AsyncSynchronized.Benchmark;
+﻿namespace kasthack.AsyncSynchronized.Benchmark.Targets;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;

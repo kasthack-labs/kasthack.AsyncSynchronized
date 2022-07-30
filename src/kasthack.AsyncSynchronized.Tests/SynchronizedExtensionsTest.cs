@@ -13,13 +13,25 @@ namespace kasthack.AsyncSynchronized.Tests
         public async Task RawTargetWorks() => await this.AssertTargetProperties(new TestTarget(), 2, 2, 0).ConfigureAwait(false);
 
         [Fact]
-        public async Task InterceptedClassTargetWorks() => await this.AssertTargetProperties(new TestTarget().Synchronized(this.Logger), 1, 1, 0).ConfigureAwait(false);
+        public async Task InterceptedClassTargetWorks() => await this.AssertTargetProperties(new TestTarget().Synchronized(
+#if DEBUG
+            this.Logger
+#endif
+        ), 1, 1, 0).ConfigureAwait(false);
 
         [Fact]
-        public void InterceptionWithoutPublicParameterlessConstructorFails() => Assert.Throws<ArgumentException>(() => new InterfacedTestTarget(1).Synchronized(this.Logger));
+        public void InterceptionWithoutPublicParameterlessConstructorFails() => Assert.Throws<ArgumentException>(() => new InterfacedTestTarget(1).Synchronized(
+#if DEBUG
+            this.Logger
+#endif
+        ));
 
         [Fact]
-        public async Task InterceptedInterfaceTargetWorks() => await this.AssertTargetProperties(new InterfacedTestTarget(1).Synchronized<ITestTarget>(this.Logger), 1, 1, 0).ConfigureAwait(false);
+        public async Task InterceptedInterfaceTargetWorks() => await this.AssertTargetProperties(new InterfacedTestTarget(1).Synchronized<ITestTarget>(
+#if DEBUG
+            this.Logger
+#endif
+    ), 1, 1, 0).ConfigureAwait(false);
 
         private async Task AssertTargetProperties(ITestTarget target, int exprectedProgressThreads, int expectedProgressCalls, int expectedProgressReturns)
         {
